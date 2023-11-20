@@ -1,0 +1,230 @@
+```python
+import pandas as pd
+import networkx as nx
+```
+
+
+```python
+df= pd.read_csv('./df.csv',index_col=0)
+df.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>H04N5</td>
+      <td>H04N7</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>G06F3</td>
+      <td>G02F1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>G06F3</td>
+      <td>H03K17</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>G02F1</td>
+      <td>H03K17</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+```python
+# 检查 'A' 和 'B' 这两列是否有空值
+df_cal = df.dropna(subset=['A', 'B'])
+
+```
+
+
+```python
+# 首先对数据进行分组，并聚合权重
+grouped = df_cal.groupby(['A', 'B']).size().reset_index(name='weight')
+grouped.head()
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A61B6</td>
+      <td>G01T1</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A61B6</td>
+      <td>G01T7</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A61B6</td>
+      <td>G03B42</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A61B6</td>
+      <td>G06T1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>A61B6</td>
+      <td>H01L31</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# 使用 DataFrame 构建网络图
+G = nx.from_pandas_edgelist(grouped, 'A', 'B',edge_attr='weight')
+print(G.edges(data = True))
+```
+
+    [('A61B6', 'G01T1', {'weight': 2}), ('A61B6', 'G01T7', {'weight': 2}), ('A61B6', 'G03B42', {'weight': 1}), ('A61B6', 'G06T1', {'weight': 1}), ('A61B6', 'H01L31', {'weight': 2}), ('A61B6', 'H04L29', {'weight': 2}), ('A61B6', 'H04N5', {'weight': 2}), ('G01T1', 'G01T7', {'weight': 2}), ('G01T1', 'G03B42', {'weight': 1}), ('G01T1', 'H01L31', {'weight': 2}), ('G01T1', 'H04L29', {'weight': 2}), ('G01T1', 'H04N5', {'weight': 2}), ('G01T7', 'G03B42', {'weight': 1}), ('G01T7', 'H01L31', {'weight': 2}), ('G01T7', 'H04L29', {'weight': 2}), ('G01T7', 'H04N5', {'weight': 2}), ('G03B42', 'H01L31', {'weight': 2}), ('G03B42', 'H04L29', {'weight': 2}), ('G03B42', 'H04N5', {'weight': 2}), ('H01L31', 'H04L29', {'weight': 2}), ('H01L31', 'H04N5', {'weight': 2}), ('H01L31', 'H01L33', {'weight': 1}), ('H04L29', 'G06C1', {'weight': 1}), ('H04L29', 'G06F13', {'weight': 1}), ('H04L29', 'G06F17', {'weight': 1}), ('H04L29', 'G06F3', {'weight': 1}), ('H04L29', 'H04B1', {'weight': 1}), ('H04L29', 'H04L12', {'weight': 3}), ('H04L29', 'G06F1', {'weight': 1}), ('H04L29', 'G06F11', {'weight': 1}), ('H04L29', 'G06F15', {'weight': 1}), ('H04L29', 'G06F21', {'weight': 3}), ('H04L29', 'G06F9', {'weight': 1}), ('H04L29', 'G11B20', {'weight': 1}), ('H04L29', 'H04L69', {'weight': 1}), ('H04L29', 'H04L7', {'weight': 1}), ('H04L29', 'H04N21', {'weight': 1}), ('H04L29', 'H04N5', {'weight': 3}), ('H04L29', 'H04N7', {'weight': 2}), ('H04L29', 'H04W12', {'weight': 1}), ('H04L29', 'H04W4', {'weight': 2}), ('H04L29', 'H04W84', {'weight': 1}), ('H04L29', 'H04Q1', {'weight': 1}), ('H04L29', 'H04Q7', {'weight': 1}), ('H04N5', 'G01N21', {'weight': 1}), ('H04N5', 'G02B19', {'weight': 1}), ('H04N5', 'G02B26', {'weight': 1}), ('H04N5', 'G02B27', {'weight': 1}), ('H04N5', 'G02F1', {'weight': 1}), ('H04N5', 'G03B19', {'weight': 1}), ('H04N5', 'G03B21', {'weight': 1}), ('H04N5', 'G03B7', {'weight': 1}), ('H04N5', 'G03B9', {'weight': 1}), ('H04N5', 'G06F12', {'weight': 1}), ('H04N5', 'G06F13', {'weight': 1}), ('H04N5', 'G06F21', {'weight': 2}), ('H04N5', 'G09G3', {'weight': 2}), ('H04N5', 'G09G5', {'weight': 1}), ('H04N5', 'G11B20', {'weight': 3}), ('H04N5', 'G11B27', {'weight': 2}), ('H04N5', 'G11B7', {'weight': 2}), ('H04N5', 'H04B7', {'weight': 1}), ('H04N5', 'H04L12', {'weight': 1}), ('H04N5', 'H04M1', {'weight': 1}), ('H04N5', 'H04N1', {'weight': 2}), ('H04N5', 'G03B13', {'weight': 1}), ('H04N5', 'G06K9', {'weight': 1}), ('H04N5', 'G06T7', {'weight': 1}), ('H04N5', 'G11B19', {'weight': 2}), ('H04N5', 'H04L69', {'weight': 1}), ('H04N5', 'H04N7', {'weight': 1}), ('H04N5', 'H04N9', {'weight': 1}), ('H04N5', 'H04W12', {'weight': 1}), ('H04N5', 'H04W4', {'weight': 2}), ('H04N5', 'H04W72', {'weight': 1}), ('H04N5', 'H04W84', {'weight': 1}), ('H04N5', 'H05K13', {'weight': 1}), ('A61B8', 'G06T17', {'weight': 1}), ('G06T17', 'B25J9', {'weight': 1}), ('G06T17', 'G06F17', {'weight': 1}), ('G06T17', 'G06F9', {'weight': 1}), ('G06T17', 'G06G7', {'weight': 1}), ('A61N1', 'G06F15', {'weight': 1}), ('G06F15', 'G03G21', {'weight': 1}), ('G06F15', 'G06F1', {'weight': 1}), ('G06F15', 'G06F11', {'weight': 1}), ('G06F15', 'G06F12', {'weight': 3}), ('G06F15', 'G06F13', {'weight': 2}), ('G06F15', 'G06F21', {'weight': 1}), ('G06F15', 'G06F40', {'weight': 1}), ('G06F15', 'G06F9', {'weight': 1}), ('G06F15', 'H04L12', {'weight': 2}), ('G06F15', 'G06F17', {'weight': 1}), ('A63F13', 'A63F9', {'weight': 1}), ('A63F13', 'G06F19', {'weight': 1}), ('A63F13', 'G09F23', {'weight': 1}), ('A63F13', 'A63F7', {'weight': 1}), ('A63F9', 'A63F7', {'weight': 1}), ('A63F9', 'G09F23', {'weight': 1}), ('A63F9', 'G06F19', {'weight': 1}), ('G06F19', 'A63F7', {'weight': 1}), ('G06F19', 'G05B17', {'weight': 1}), ('G06F19', 'G06F17', {'weight': 1}), ('G06F19', 'G06G7', {'weight': 1}), ('G06F19', 'G09F23', {'weight': 1}), ('G06F19', 'G06F9', {'weight': 1}), ('G09F23', 'A63F7', {'weight': 1}), ('B05B1', 'B08B3', {'weight': 1}), ('B05B1', 'H01L21', {'weight': 1}), ('B05B1', 'H05K3', {'weight': 1}), ('B08B3', 'H01L21', {'weight': 1}), ('B08B3', 'H05K3', {'weight': 1}), ('B08B3', 'G02F1', {'weight': 1}), ('H01L21', 'C25D21', {'weight': 1}), ('H01L21', 'C25D3', {'weight': 1}), ('H01L21', 'G03F7', {'weight': 3}), ('H01L21', 'G11C11', {'weight': 5}), ('H01L21', 'G11C16', {'weight': 1}), ('H01L21', 'H01F7', {'weight': 1}), ('H01L21', 'B29C43', {'weight': 1}), ('H01L21', 'B29C45', {'weight': 1}), ('H01L21', 'C07F7', {'weight': 2}), ('H01L21', 'C09J7', {'weight': 1}), ('H01L21', 'C11D1', {'weight': 1}), ('H01L21', 'C11D11', {'weight': 1}), ('H01L21', 'C23C16', {'weight': 1}), ('H01L21', 'G01B11', {'weight': 1}), ('H01L21', 'G01B9', {'weight': 1}), ('H01L21', 'G02F1', {'weight': 1}), ('H01L21', 'G06F11', {'weight': 1}), ('H01L21', 'H01L23', {'weight': 1}), ('H01L21', 'H01L27', {'weight': 6}), ('H01L21', 'H01L29', {'weight': 3}), ('H01L21', 'H01L41', {'weight': 1}), ('H01L21', 'H02K41', {'weight': 1}), ('H01L21', 'H02K7', {'weight': 1}), ('H01L21', 'H05K3', {'weight': 2}), ('H01L21', 'H01L43', {'weight': 2}), ('H05K3', 'C08G59', {'weight': 1}), ('H05K3', 'C08L101', {'weight': 1}), ('H05K3', 'C08L63', {'weight': 1}), ('H05K3', 'C25D21', {'weight': 1}), ('H05K3', 'C25D3', {'weight': 1}), ('H05K3', 'G03F7', {'weight': 1}), ('H05K3', 'H01H85', {'weight': 1}), ('H05K3', 'H01L23', {'weight': 1}), ('H05K3', 'H01R4', {'weight': 1}), ('H05K3', 'H01R43', {'weight': 1}), ('H05K3', 'H05K1', {'weight': 1}), ('H05K3', 'B32B37', {'weight': 1}), ('H05K3', 'H01Q1', {'weight': 1}), ('B22F3', 'H02N11', {'weight': 1}), ('B22F3', 'H01L35', {'weight': 1}), ('H02N11', 'H01L35', {'weight': 1}), ('B25J9', 'G06G7', {'weight': 1}), ('B25J9', 'G06F17', {'weight': 1}), ('B25J9', 'G06F9', {'weight': 1}), ('G06G7', 'G05B17', {'weight': 1}), ('G06G7', 'G06F17', {'weight': 2}), ('G06G7', 'G06F9', {'weight': 2}), ('B29C45', 'B29C43', {'weight': 1}), ('B29C65', 'C03B37', {'weight': 1}), ('B29C65', 'G02B6', {'weight': 1}), ('B29C65', 'B65H75', {'weight': 1}), ('C03B37', 'B65H75', {'weight': 1}), ('C03B37', 'G02B6', {'weight': 1}), ('G02B6', 'B65H75', {'weight': 1}), ('G02B6', 'G02B26', {'weight': 1}), ('G02B6', 'G02F1', {'weight': 1}), ('G02B6', 'H04B10', {'weight': 1}), ('G02B6', 'H04J14', {'weight': 1}), ('B41M5', 'C07D493', {'weight': 1}), ('B41M5', 'C07D209', {'weight': 1}), ('B41M5', 'C07D277', {'weight': 1}), ('B41M5', 'C09B23', {'weight': 1}), ('B41M5', 'G11B7', {'weight': 1}), ('C07D493', 'C07D209', {'weight': 1}), ('C07D493', 'C07D277', {'weight': 1}), ('C07D493', 'C09B23', {'weight': 1}), ('C07D493', 'G11B7', {'weight': 1}), ('B42D15', 'H01M2', {'weight': 1}), ('B42D15', 'G06K19', {'weight': 1}), ('H01M2', 'G01R31', {'weight': 1}), ('H01M2', 'G06K19', {'weight': 1}), ('H01M2', 'H01M10', {'weight': 1}), ('H01M2', 'H02J7', {'weight': 1}), ('B60K26', 'B60T17', {'weight': 1}), ('B60K26', 'B60T7', {'weight': 1}), ('B60K26', 'B60T8', {'weight': 1}), ('B60K26', 'B60W30', {'weight': 1}), ('B60K26', 'B60W40', {'weight': 1}), ('B60K26', 'G08B21', {'weight': 1}), ('B60K26', 'B60K28', {'weight': 1}), ('B60K26', 'B60R21', {'weight': 1}), ('B60K26', 'G08G1', {'weight': 1}), ('B60T17', 'B60K28', {'weight': 1}), ('B60T17', 'B60R21', {'weight': 1}), ('B60T17', 'B60W30', {'weight': 1}), ('B60T17', 'B60W40', {'weight': 1}), ('B60T17', 'G08B21', {'weight': 1}), ('B60T17', 'B60T7', {'weight': 1}), ('B60T17', 'B60T8', {'weight': 1}), ('B60T17', 'G08G1', {'weight': 1}), ('B60T7', 'B60K28', {'weight': 1}), ('B60T7', 'B60R21', {'weight': 1}), ('B60T7', 'B60T8', {'weight': 1}), ('B60T7', 'B60W30', {'weight': 1}), ('B60T7', 'B60W40', {'weight': 1}), ('B60T7', 'G08B21', {'weight': 1}), ('B60T7', 'G08G1', {'weight': 1}), ('B60T8', 'B60K28', {'weight': 1}), ('B60T8', 'B60R21', {'weight': 1}), ('B60T8', 'B60W30', {'weight': 1}), ('B60T8', 'B60W40', {'weight': 1}), ('B60T8', 'G08B21', {'weight': 1}), ('B60T8', 'G08G1', {'weight': 1}), ('B60W30', 'B60K28', {'weight': 1}), ('B60W30', 'B60R21', {'weight': 1}), ('B60W30', 'B60W40', {'weight': 1}), ('B60W30', 'G08B21', {'weight': 1}), ('B60W30', 'G08G1', {'weight': 1}), ('B60W40', 'B60K28', {'weight': 1}), ('B60W40', 'B60R21', {'weight': 1}), ('B60W40', 'G08B21', {'weight': 1}), ('B60W40', 'G08G1', {'weight': 1}), ('G08B21', 'B60K28', {'weight': 1}), ('G08B21', 'B60R21', {'weight': 1}), ('G08B21', 'G08G1', {'weight': 1}), ('B60K28', 'B60R21', {'weight': 1}), ('B60K28', 'G08G1', {'weight': 1}), ('B60R21', 'G08G1', {'weight': 1}), ('B65B1', 'B65B59', {'weight': 1}), ('B65B1', 'G06Q50', {'weight': 1}), ('B65B1', 'B65B57', {'weight': 1}), ('B65B1', 'G06Q90', {'weight': 1}), ('B65B59', 'B65B57', {'weight': 1}), ('B65B59', 'G06Q50', {'weight': 1}), ('B65B59', 'G06Q90', {'weight': 1}), ('G06Q50', 'B65B57', {'weight': 1}), ('G06Q50', 'G06Q10', {'weight': 1}), ('G06Q50', 'G06Q20', {'weight': 1}), ('G06Q50', 'G06Q30', {'weight': 1}), ('G06Q50', 'H04M15', {'weight': 1}), ('G06Q50', 'G06Q90', {'weight': 1}), ('G06Q50', 'G07F7', {'weight': 1}), ('B65B57', 'G06Q90', {'weight': 1}), ('B65H1', 'G06Q20', {'weight': 1}), ('B65H1', 'G07B17', {'weight': 1}), ('B65H1', 'G07D11', {'weight': 1}), ('B65H1', 'G07F19', {'weight': 1}), ('B65H1', 'B65H29', {'weight': 1}), ('G06Q20', 'B65H29', {'weight': 1}), ('G06Q20', 'G06Q10', {'weight': 1}), ('G06Q20', 'G06Q30', {'weight': 1}), ('G06Q20', 'G07D11', {'weight': 1}), ('G06Q20', 'H04M15', {'weight': 1}), ('G06Q20', 'G07B17', {'weight': 1}), ('G06Q20', 'G07F19', {'weight': 1}), ('G06Q20', 'G07F7', {'weight': 1}), ('G07B17', 'B65H29', {'weight': 1}), ('G07B17', 'G07D11', {'weight': 1}), ('G07B17', 'G07F19', {'weight': 1}), ('G07D11', 'B65H29', {'weight': 1}), ('G07D11', 'G07F19', {'weight': 1}), ('G07F19', 'B65H29', {'weight': 1}), ('C07D209', 'C07D277', {'weight': 1}), ('C07D209', 'C09B23', {'weight': 1}), ('C07D209', 'G11B7', {'weight': 1}), ('C07D277', 'C09B23', {'weight': 1}), ('C07D277', 'G11B7', {'weight': 1}), ('C09B23', 'G11B7', {'weight': 1}), ('C08G59', 'C08L101', {'weight': 1}), ('C08G59', 'C08L63', {'weight': 1}), ('C08G59', 'G03F7', {'weight': 1}), ('C08L101', 'C08K3', {'weight': 1}), ('C08L101', 'C08K5', {'weight': 1}), ('C08L101', 'G03F7', {'weight': 1}), ('C08L101', 'H05K5', {'weight': 1}), ('C08L101', 'C08L63', {'weight': 1}), ('C08L101', 'H04R1', {'weight': 1}), ('C08L63', 'G03F7', {'weight': 1}), ('G03F7', 'C11D1', {'weight': 1}), ('G03F7', 'C11D11', {'weight': 1}), ('G03F7', 'G01B11', {'weight': 1}), ('G03F7', 'G01B9', {'weight': 1}), ('G03F7', 'H01L41', {'weight': 1}), ('G03F7', 'H02K41', {'weight': 1}), ('G03F7', 'H02K7', {'weight': 1}), ('G03F7', 'H01F7', {'weight': 1}), ('C08K3', 'C08K5', {'weight': 1}), ('C08K3', 'H04R1', {'weight': 1}), ('C08K3', 'H05K5', {'weight': 1}), ('C08K5', 'H04R1', {'weight': 1}), ('C08K5', 'H05K5', {'weight': 1}), ('H05K5', 'H01G2', {'weight': 1}), ('H05K5', 'H04R1', {'weight': 1}), ('C11D1', 'C11D11', {'weight': 1}), ('C23C16', 'C07F7', {'weight': 1}), ('C25D21', 'C25D3', {'weight': 1}), ('F04D13', 'H02K21', {'weight': 1}), ('F04D13', 'H02K5', {'weight': 1}), ('F04D13', 'F04D29', {'weight': 1}), ('F04D13', 'F04D5', {'weight': 1}), ('F04D13', 'G06F1', {'weight': 1}), ('F04D13', 'H05K7', {'weight': 1}), ('H02K21', 'F04D29', {'weight': 1}), ('H02K21', 'F04D5', {'weight': 1}), ('H02K21', 'G06F1', {'weight': 1}), ('H02K21', 'H02K19', {'weight': 1}), ('H02K21', 'H02M7', {'weight': 1}), ('H02K21', 'H02P7', {'weight': 1}), ('H02K21', 'H02P9', {'weight': 1}), ('H02K21', 'H02K5', {'weight': 1}), ('H02K21', 'H02P27', {'weight': 1}), ('H02K21', 'H05K7', {'weight': 1}), ('H02K5', 'F04D29', {'weight': 1}), ('H02K5', 'F04D5', {'weight': 1}), ('H02K5', 'G06F1', {'weight': 1}), ('H02K5', 'H05K7', {'weight': 1}), ('F04D29', 'G06F1', {'weight': 1}), ('F04D29', 'H05K7', {'weight': 1}), ('F04D29', 'F04D5', {'weight': 1}), ('G06F1', 'F04D5', {'weight': 1}), ('G06F1', 'G06F11', {'weight': 1}), ('G06F1', 'G06F21', {'weight': 1}), ('G06F1', 'G06F9', {'weight': 1}), ('G06F1', 'H04B1', {'weight': 1}), ('G06F1', 'H05K7', {'weight': 1}), ('G06F1', 'H01L23', {'weight': 1}), ('G06F1', 'H04L12', {'weight': 1}), ('H05K7', 'F04D5', {'weight': 1}), ('H05K7', 'H01L23', {'weight': 1}), ('H05K7', 'F24F13', {'weight': 1}), ('F16B1', 'F16F15', {'weight': 1}), ('F16B1', 'F16M11', {'weight': 1}), ('F16B1', 'G01S13', {'weight': 1}), ('F16B1', 'H01Q1', {'weight': 1}), ('F16B1', 'H01Q3', {'weight': 1}), ('F16F15', 'F16M11', {'weight': 1}), ('F16F15', 'G01S13', {'weight': 1}), ('F16F15', 'H01Q1', {'weight': 1}), ('F16F15', 'H01Q3', {'weight': 1}), ('F16C19', 'G01D5', {'weight': 1}), ('F16C19', 'H02K11', {'weight': 1}), ('F16C19', 'F16C41', {'weight': 1}), ('F16C19', 'G01P3', {'weight': 1}), ('G01D5', 'F16C41', {'weight': 1}), ('G01D5', 'H02K11', {'weight': 1}), ('G01D5', 'G01P3', {'weight': 1}), ('H02K11', 'F16C41', {'weight': 1}), ('H02K11', 'G01P3', {'weight': 1}), ('F16C41', 'G01P3', {'weight': 1}), ('F16M11', 'G01S13', {'weight': 1}), ('F16M11', 'H01Q1', {'weight': 1}), ('F16M11', 'H01Q3', {'weight': 1}), ('G01S13', 'H01Q1', {'weight': 1}), ('G01S13', 'H01Q3', {'weight': 1}), ('H01Q1', 'H01L23', {'weight': 1}), ('H01Q1', 'H01Q13', {'weight': 1}), ('H01Q1', 'H01Q9', {'weight': 2}), ('H01Q1', 'H01R13', {'weight': 1}), ('H01Q1', 'H01R4', {'weight': 1}), ('H01Q1', 'H01Q3', {'weight': 1}), ('F25B21', 'H01L35', {'weight': 1}), ('G01B9', 'G01B11', {'weight': 1}), ('G01C21', 'G05G19', {'weight': 1}), ('G01C21', 'G07B15', {'weight': 1}), ('G01C21', 'G08G1', {'weight': 1}), ('G01C21', 'H04B7', {'weight': 1}), ('G01C21', 'G01D21', {'weight': 1}), ('G05G19', 'G01D21', {'weight': 1}), ('G07B15', 'G08G1', {'weight': 1}), ('G07B15', 'H04B7', {'weight': 1}), ('G08G1', 'H04B7', {'weight': 1}), ('H04B7', 'G06F12', {'weight': 1}), ('H04B7', 'G06F21', {'weight': 1}), ('H04B7', 'G11B20', {'weight': 1}), ('H04B7', 'G11B27', {'weight': 1}), ('H04B7', 'H03M7', {'weight': 1}), ('H04B7', 'H04B1', {'weight': 2}), ('H04B7', 'H04J99', {'weight': 1}), ('H04B7', 'H04L1', {'weight': 1}), ('H04B7', 'H04L12', {'weight': 1}), ('H04B7', 'H04L25', {'weight': 1}), ('H04B7', 'H04M1', {'weight': 1}), ('H04B7', 'H04N1', {'weight': 1}), ('H04B7', 'H04N9', {'weight': 1}), ('H04B7', 'H04Q7', {'weight': 1}), ('H04B7', 'H04W16', {'weight': 1}), ('H04B7', 'H04W24', {'weight': 1}), ('H04B7', 'H04W28', {'weight': 1}), ('H04B7', 'H04W4', {'weight': 1}), ('H04B7', 'H04W48', {'weight': 1}), ('H04B7', 'H04W72', {'weight': 1}), ('H04B7', 'H04W76', {'weight': 1}), ('H04B7', 'H04W84', {'weight': 2}), ('H04B7', 'H04W88', {'weight': 1}), ('H04B7', 'H04W99', {'weight': 1}), ('G01D11', 'H03M1', {'weight': 1}), ('G01D11', 'H01H19', {'weight': 1}), ('H03M1', 'H01H19', {'weight': 1}), ('G01L9', 'G01P1', {'weight': 1}), ('G01L9', 'G01P15', {'weight': 1}), ('G01L9', 'H01L29', {'weight': 1}), ('G01P1', 'G01P15', {'weight': 1}), ('G01P1', 'H01L29', {'weight': 1}), ('G01N21', 'H05K13', {'weight': 1}), ('G01P15', 'H01L29', {'weight': 1}), ('H01L29', 'G02B5', {'weight': 1}), ('H01L29', 'G02F1', {'weight': 2}), ('H01L29', 'G06K19', {'weight': 3}), ('H01L29', 'G11C11', {'weight': 1}), ('H01L29', 'G11C16', {'weight': 1}), ('H01L29', 'H01L23', {'weight': 3}), ('H01L29', 'H01L25', {'weight': 3}), ('H01L29', 'H01L27', {'weight': 5}), ('H01L29', 'H02H9', {'weight': 3}), ('G01R31', 'G11C16', {'weight': 1}), ('G01R31', 'H02J7', {'weight': 1}), ('G01R31', 'G11C29', {'weight': 2}), ('G01R31', 'H01M10', {'weight': 1}), ('G11C16', 'G06F12', {'weight': 1}), ('G11C16', 'G11C11', {'weight': 1}), ('G11C16', 'G11C13', {'weight': 1}), ('G11C16', 'G11C7', {'weight': 1}), ('G11C16', 'H01L27', {'weight': 2}), ('G11C16', 'G11C29', {'weight': 1}), ('G11C16', 'H01L45', {'weight': 1}), ('H02J7', 'H01M10', {'weight': 1}), ('G02B19', 'G02B27', {'weight': 1}), ('G02B19', 'G03B21', {'weight': 1}), ('G02B27', 'G02B26', {'weight': 1}), ('G02B27', 'G02F1', {'weight': 1}), ('G02B27', 'G09G3', {'weight': 1}), ('G02B27', 'G09G5', {'weight': 1}), ('G02B27', 'H04M1', {'weight': 1}), ('G02B27', 'H04N9', {'weight': 1}), ('G02B27', 'G03B21', {'weight': 1}), ('G02B26', 'G02F1', {'weight': 2}), ('G02B26', 'G09G5', {'weight': 1}), ('G02B26', 'H04J14', {'weight': 1}), ('G02B26', 'H04N9', {'weight': 1}), ('G02B26', 'G09G3', {'weight': 1}), ('G02F1', 'G02B5', {'weight': 1}), ('G02F1', 'G09G3', {'weight': 2}), ('G02F1', 'G09G5', {'weight': 1}), ('G02F1', 'H01L27', {'weight': 1}), ('G02F1', 'H01S3', {'weight': 1}), ('G02F1', 'H03K17', {'weight': 1}), ('G02F1', 'H04J14', {'weight': 1}), ('G02F1', 'G06F3', {'weight': 1}), ('G02F1', 'G09F9', {'weight': 1}), ('G02F1', 'H04N9', {'weight': 1}), ('G02F1', 'H05B37', {'weight': 1}), ('G09G5', 'G06F13', {'weight': 1}), ('G09G5', 'G09G3', {'weight': 2}), ('G09G5', 'H04B3', {'weight': 1}), ('G09G5', 'H03K19', {'weight': 1}), ('G09G5', 'H04N9', {'weight': 1}), ('H04N9', 'G06F12', {'weight': 1}), ('H04N9', 'G06F21', {'weight': 1}), ('H04N9', 'G09G3', {'weight': 1}), ('H04N9', 'G11B20', {'weight': 2}), ('H04N9', 'G11B27', {'weight': 2}), ('H04N9', 'H04M1', {'weight': 1}), ('H04N9', 'H04N1', {'weight': 1}), ('H04N9', 'H04W4', {'weight': 1}), ('H04N9', 'H04W72', {'weight': 1}), ('G09G3', 'G06F13', {'weight': 1}), ('G09G3', 'G11C11', {'weight': 1}), ('G09G3', 'H01L27', {'weight': 2}), ('G09G3', 'H01L51', {'weight': 1}), ('G09G3', 'H03K19', {'weight': 1}), ('G09G3', 'H04B3', {'weight': 1}), ('G09G3', 'H05B33', {'weight': 2}), ('H04M1', 'G06F12', {'weight': 1}), ('H04M1', 'G06F21', {'weight': 1}), ('H04M1', 'G11B20', {'weight': 1}), ('H04M1', 'G11B27', {'weight': 1}), ('H04M1', 'H04N1', {'weight': 1}), ('H04M1', 'H04Q7', {'weight': 1}), ('H04M1', 'H04W4', {'weight': 1}), ('H04M1', 'H04W72', {'weight': 1}), ('G02B5', 'G03H1', {'weight': 1}), ('G02B5', 'G11B7', {'weight': 1}), ('G02B5', 'H01S5', {'weight': 1}), ('G03H1', 'G11B7', {'weight': 1}), ('G11B7', 'G06F12', {'weight': 1}), ('G11B7', 'G11B20', {'weight': 1}), ('G11B7', 'G11B27', {'weight': 1}), ('G11B7', 'G11B19', {'weight': 2}), ('G11B7', 'H01S5', {'weight': 1}), ('H01L27', 'G06F12', {'weight': 1}), ('H01L27', 'G09F9', {'weight': 1}), ('H01L27', 'G11C11', {'weight': 3}), ('H01L27', 'H01L23', {'weight': 3}), ('H01L27', 'G06F11', {'weight': 1}), ('H01L27', 'G06K19', {'weight': 3}), ('H01L27', 'G11C13', {'weight': 1}), ('H01L27', 'G11C7', {'weight': 2}), ('H01L27', 'H01L25', {'weight': 3}), ('H01L27', 'H02H9', {'weight': 3}), ('H01L27', 'H05B33', {'weight': 1}), ('H01L27', 'H01L43', {'weight': 2}), ('H01L27', 'H01L45', {'weight': 1}), ('H01L27', 'H01L51', {'weight': 1}), ('H03K17', 'G06F3', {'weight': 1}), ('G03B19', 'G06K9', {'weight': 1}), ('G03B19', 'G06T7', {'weight': 1}), ('G03B19', 'H04N1', {'weight': 1}), ('G06K9', 'G06F3', {'weight': 1}), ('G06K9', 'G07C9', {'weight': 1}), ('G06K9', 'G08B13', {'weight': 1}), ('G06K9', 'H04N7', {'weight': 1}), ('G06K9', 'G06T7', {'weight': 1}), ('G06K9', 'H04N1', {'weight': 1}), ('G06T7', 'H04N1', {'weight': 1}), ('G03B7', 'G03B13', {'weight': 1}), ('H01L41', 'H01F7', {'weight': 1}), ('H01L41', 'H02K41', {'weight': 1}), ('H01L41', 'H02K7', {'weight': 1}), ('H02K41', 'H01F7', {'weight': 1}), ('H02K41', 'H02K7', {'weight': 1}), ('H02K7', 'H01F7', {'weight': 1}), ('G03G21', 'H04L12', {'weight': 1}), ('G03G21', 'G06F13', {'weight': 1}), ('H04L12', 'G06F12', {'weight': 1}), ('H04L12', 'G06F13', {'weight': 4}), ('H04L12', 'G06F21', {'weight': 1}), ('H04L12', 'G06F3', {'weight': 1}), ('H04L12', 'H04B1', {'weight': 1}), ('H04L12', 'G06C1', {'weight': 1}), ('H04L12', 'G06F11', {'weight': 1}), ('H04L12', 'G06F17', {'weight': 1}), ('H04L12', 'G06F9', {'weight': 1}), ('H04L12', 'H04L69', {'weight': 1}), ('H04L12', 'H04M3', {'weight': 1}), ('H04L12', 'H04W12', {'weight': 1}), ('H04L12', 'H04W28', {'weight': 1}), ('H04L12', 'H04W4', {'weight': 2}), ('H04L12', 'H04W84', {'weight': 2}), ('H04L12', 'H04W99', {'weight': 1}), ('H04L12', 'H04Q3', {'weight': 1}), ('H04L12', 'H04Q7', {'weight': 1}), ('H04L12', 'H04W76', {'weight': 1}), ('H04L12', 'H04W80', {'weight': 1}), ('G05B17', 'G06F17', {'weight': 1}), ('G05B17', 'G06F9', {'weight': 1}), ('G06F17', 'G06F12', {'weight': 1}), ('G06F17', 'G06F13', {'weight': 2}), ('G06F17', 'G06F3', {'weight': 1}), ('G06F17', 'G06F40', {'weight': 1}), ('G06F17', 'G06F9', {'weight': 2}), ('G06F17', 'H04Q1', {'weight': 1}), ('G06F11', 'G06F21', {'weight': 1}), ('G06F11', 'G06F13', {'weight': 1}), ('G06F11', 'G06F9', {'weight': 2}), ('G06F21', 'G06F12', {'weight': 1}), ('G06F21', 'G06F13', {'weight': 1}), ('G06F21', 'G11B20', {'weight': 1}), ('G06F21', 'H04L69', {'weight': 1}), ('G06F21', 'H04N1', {'weight': 1}), ('G06F21', 'H04W12', {'weight': 1}), ('G06F21', 'H04W4', {'weight': 2}), ('G06F21', 'H04W72', {'weight': 1}), ('G06F21', 'H04W84', {'weight': 1}), ('G06F21', 'G06F9', {'weight': 1}), ('G06F21', 'G11B27', {'weight': 1}), ('G06F9', 'G06F13', {'weight': 1}), ('H04B1', 'H03M7', {'weight': 1}), ('H04B1', 'H03H7', {'weight': 1}), ('H04B1', 'H04J99', {'weight': 1}), ('H04B1', 'H04L1', {'weight': 1}), ('H04B1', 'H04L25', {'weight': 1}), ('H04B1', 'H04W24', {'weight': 1}), ('H04B1', 'H04W28', {'weight': 1}), ('H04B1', 'H04W48', {'weight': 1}), ('H04B1', 'H04W76', {'weight': 1}), ('H04B1', 'H04W84', {'weight': 1}), ('H04B1', 'H04W88', {'weight': 1}), ('H04B1', 'H04Q3', {'weight': 1}), ('G06F12', 'G06F13', {'weight': 1}), ('G06F12', 'G11B20', {'weight': 4}), ('G06F12', 'G11B27', {'weight': 1}), ('G06F12', 'G11C11', {'weight': 1}), ('G06F12', 'G11C7', {'weight': 1}), ('G06F12', 'H04N1', {'weight': 1}), ('G06F12', 'H04W4', {'weight': 1}), ('G06F12', 'H04W72', {'weight': 1}), ('G06F13', 'G06F3', {'weight': 1}), ('G06F13', 'G06K7', {'weight': 1}), ('G06F13', 'G11C5', {'weight': 1}), ('G06F13', 'H03K19', {'weight': 1}), ('G06F13', 'H04B3', {'weight': 1}), ('G06F13', 'H04L69', {'weight': 1}), ('G06F13', 'H04W12', {'weight': 1}), ('G06F13', 'H04W4', {'weight': 1}), ('G06F13', 'H04W84', {'weight': 1}), ('G06F13', 'H04Q1', {'weight': 1}), ('G11B20', 'G06F3', {'weight': 1}), ('G11B20', 'G11B19', {'weight': 2}), ('G11B20', 'G11B27', {'weight': 1}), ('G11B20', 'H04N1', {'weight': 1}), ('G11B20', 'H04N21', {'weight': 1}), ('G11B20', 'H04N7', {'weight': 1}), ('G11B20', 'H04W4', {'weight': 1}), ('G11B20', 'H04W72', {'weight': 1}), ('G11B20', 'G11B21', {'weight': 1}), ('G11B20', 'G11B5', {'weight': 1}), ('G11B20', 'H04L7', {'weight': 1}), ('G11B27', 'G11B19', {'weight': 2}), ('G11B27', 'H04N1', {'weight': 1}), ('G11B27', 'H04W4', {'weight': 1}), ('G11B27', 'H04W72', {'weight': 1}), ('G11C11', 'G11C13', {'weight': 1}), ('G11C11', 'G11C29', {'weight': 1}), ('G11C11', 'G11C7', {'weight': 4}), ('G11C11', 'H01L43', {'weight': 2}), ('G11C11', 'H01L45', {'weight': 1}), ('G11C11', 'H01L51', {'weight': 1}), ('G11C11', 'H05B33', {'weight': 1}), ('G11C7', 'G11C29', {'weight': 1}), ('H04N1', 'H04W4', {'weight': 1}), ('H04N1', 'H04W72', {'weight': 1}), ('H04W4', 'H04Q7', {'weight': 1}), ('H04W4', 'H04L69', {'weight': 1}), ('H04W4', 'H04W12', {'weight': 1}), ('H04W4', 'H04W72', {'weight': 1}), ('H04W4', 'H04W84', {'weight': 1}), ('H04W72', 'H04J13', {'weight': 1}), ('H04W72', 'H04Q7', {'weight': 1}), ('H04W72', 'H04W16', {'weight': 1}), ('H04W72', 'H04W24', {'weight': 1}), ('H04W72', 'H04W28', {'weight': 1}), ('H04W72', 'H04W76', {'weight': 1}), ('G06F3', 'G11C5', {'weight': 1}), ('G06F3', 'G11B21', {'weight': 1}), ('G06F3', 'G11B5', {'weight': 1}), ('H03K19', 'H04B3', {'weight': 1}), ('H04L69', 'H04W12', {'weight': 1}), ('H04L69', 'H04W84', {'weight': 1}), ('H04W12', 'H04W84', {'weight': 1}), ('H04W84', 'H03M7', {'weight': 1}), ('H04W84', 'H04L1', {'weight': 1}), ('H04W84', 'H04L25', {'weight': 1}), ('H04W84', 'H04W24', {'weight': 1}), ('H04W84', 'H04W28', {'weight': 2}), ('H04W84', 'H04W48', {'weight': 1}), ('H04W84', 'H04W76', {'weight': 1}), ('H04W84', 'H04W88', {'weight': 1}), ('H04W84', 'H04W99', {'weight': 1}), ('G06K19', 'H01L23', {'weight': 3}), ('G06K19', 'H01L25', {'weight': 3}), ('G06K19', 'H02H9', {'weight': 3}), ('H01L23', 'H02H9', {'weight': 3}), ('H01L23', 'H01L25', {'weight': 3}), ('H01L25', 'H02H9', {'weight': 3}), ('G07C9', 'G08B13', {'weight': 1}), ('G07C9', 'H04N7', {'weight': 1}), ('G08B13', 'H04N7', {'weight': 1}), ('H04N7', 'H04L7', {'weight': 1}), ('H04N7', 'H04N19', {'weight': 2}), ('H04N7', 'H04N21', {'weight': 1}), ('G06Q10', 'H04M15', {'weight': 1}), ('G06Q10', 'G06Q30', {'weight': 1}), ('G06Q10', 'G07F7', {'weight': 1}), ('H04M15', 'G06Q30', {'weight': 1}), ('H04M15', 'G07F7', {'weight': 1}), ('G06Q30', 'G07F7', {'weight': 1}), ('H01L51', 'H05B33', {'weight': 1}), ('H04N21', 'H04L7', {'weight': 1}), ('G11B21', 'G11B25', {'weight': 1}), ('G11B21', 'G11B33', {'weight': 1}), ('G11B21', 'G11B5', {'weight': 2}), ('G11B21', 'H02N2', {'weight': 1}), ('G11B25', 'G11B33', {'weight': 1}), ('G11B25', 'G11B5', {'weight': 1}), ('G11B33', 'G11B5', {'weight': 1}), ('G11B5', 'H01L43', {'weight': 1}), ('G11B5', 'H02N2', {'weight': 1}), ('G11C13', 'H01L45', {'weight': 1}), ('H01H85', 'H01R4', {'weight': 1}), ('H01H85', 'H01R43', {'weight': 1}), ('H01H85', 'H05K1', {'weight': 1}), ('H01R4', 'H01R13', {'weight': 1}), ('H01R4', 'H01R43', {'weight': 1}), ('H01R4', 'H05K1', {'weight': 1}), ('H01R43', 'H05K1', {'weight': 1}), ('H01Q13', 'H01Q9', {'weight': 2}), ('H02H3', 'H02H7', {'weight': 1}), ('H02H3', 'H02M3', {'weight': 1}), ('H02H7', 'H02M3', {'weight': 1}), ('H02K19', 'H02M7', {'weight': 1}), ('H02K19', 'H02P7', {'weight': 1}), ('H02K19', 'H02P9', {'weight': 1}), ('H02K19', 'H02P27', {'weight': 1}), ('H02M7', 'H02P7', {'weight': 1}), ('H02M7', 'H02P9', {'weight': 1}), ('H02M7', 'H02P27', {'weight': 1}), ('H02P7', 'H02P27', {'weight': 1}), ('H02P7', 'H02P9', {'weight': 1}), ('H02P9', 'H02P27', {'weight': 1}), ('H03M7', 'H04L1', {'weight': 1}), ('H03M7', 'H04L25', {'weight': 1}), ('H03M7', 'H04W24', {'weight': 1}), ('H03M7', 'H04W28', {'weight': 1}), ('H03M7', 'H04W48', {'weight': 1}), ('H03M7', 'H04W76', {'weight': 1}), ('H03M7', 'H04W88', {'weight': 1}), ('H04L1', 'H04L25', {'weight': 1}), ('H04L1', 'H04W24', {'weight': 1}), ('H04L1', 'H04W28', {'weight': 1}), ('H04L1', 'H04W48', {'weight': 1}), ('H04L1', 'H04W76', {'weight': 1}), ('H04L1', 'H04W88', {'weight': 1}), ('H04L25', 'H04J11', {'weight': 1}), ('H04L25', 'H04L27', {'weight': 1}), ('H04L25', 'H04W24', {'weight': 1}), ('H04L25', 'H04W28', {'weight': 1}), ('H04L25', 'H04W48', {'weight': 1}), ('H04L25', 'H04W76', {'weight': 1}), ('H04L25', 'H04W88', {'weight': 1}), ('H04W24', 'H04J13', {'weight': 1}), ('H04W24', 'H04Q7', {'weight': 1}), ('H04W24', 'H04W16', {'weight': 1}), ('H04W24', 'H04W28', {'weight': 2}), ('H04W24', 'H04W48', {'weight': 1}), ('H04W24', 'H04W76', {'weight': 2}), ('H04W24', 'H04W88', {'weight': 1}), ('H04W28', 'H04J13', {'weight': 1}), ('H04W28', 'H04Q7', {'weight': 1}), ('H04W28', 'H04W16', {'weight': 1}), ('H04W28', 'H04W48', {'weight': 1}), ('H04W28', 'H04W76', {'weight': 3}), ('H04W28', 'H04W80', {'weight': 1}), ('H04W28', 'H04W88', {'weight': 2}), ('H04W28', 'H04W99', {'weight': 1}), ('H04W48', 'H04W76', {'weight': 1}), ('H04W48', 'H04W88', {'weight': 1}), ('H04W76', 'H04J13', {'weight': 1}), ('H04W76', 'H04Q7', {'weight': 1}), ('H04W76', 'H04W16', {'weight': 1}), ('H04W76', 'H04W80', {'weight': 1}), ('H04W76', 'H04W88', {'weight': 1}), ('H04Q7', 'H04J13', {'weight': 1}), ('H04Q7', 'H04W16', {'weight': 2}), ('H04W16', 'H04J13', {'weight': 1}), ('H04J11', 'H04L27', {'weight': 1})]
+    
+
+
+```python
+
+from tqdm import tqdm
+
+def calculate_constraints_with_progress(G, nodes=None, weight='weight'):
+    if nodes is None:
+        nodes = list(G.nodes)
+    constraint = {}
+
+    # 包装nodes列表到tqdm进度条中
+    for v in tqdm(nodes, desc="Calculating constraints"):
+        # Constraint is not defined for isolated nodes
+        if len(G[v]) == 0:
+            constraint[v] = float("nan")
+            continue
+        constraint[v] = sum(
+            nx.local_constraint(G, v, n, weight) for n in set(nx.all_neighbors(G, v))
+        )
+    return constraint
+
+
+def degree_centrality_with_progress(G):
+    if len(G) <= 1:
+        return {n: 1 for n in G}
+
+    s = 1.0 / (len(G) - 1.0)
+    centrality = {}
+    
+    # 使用tqdm显示进度条
+    for n, d in tqdm(G.degree(), desc="Calculating degree centrality"):
+        centrality[n] = d * s
+
+    return centrality
+    ```
+
+
+```python
+# 结构洞
+print('****cal 结构洞 ********')
+holes_dict= calculate_constraints_with_progress(G, nodes=None, weight='weight')
+
+# 度数中心度
+print('****cal degree_centrality ********')
+degree_cen = degree_centrality_with_progress(G) 
+```
+
+    ****cal 结构洞 ********
+    
+
+    Calculating constraints: 100%|██████████| 236/236 [00:00<00:00, 237.18it/s]
+    
+
+    ****cal degree_centrality ********
+    
+
+    Calculating degree centrality: 100%|██████████| 236/236 [00:00<?, ?it/s]
+    
+
+
+```python
+
+# 将结果转换为 DataFrame
+print('****将结果转换为 DataFrame ********')
+holes_df = pd.DataFrame.from_dict(holes_dict, orient='index', columns=['Constraint'])
+degree_cen_df = pd.DataFrame.from_dict(degree_cen, orient='index', columns=['Degree Centrality'])
+
+print('****合并两个 DataFrame ********')
+combined_df = pd.concat([holes_df, degree_cen_df], axis=1)
+
+# 将结果保存为 Excel 文件
+output_filepath = 'network_analysis_results_加权.xlsx'
+combined_df.to_excel(output_filepath)
+
+output_filepath
+```
+
+    ****将结果转换为 DataFrame ********
+    ****合并两个 DataFrame ********
+      'network_analysis_results_加权.xlsx'
